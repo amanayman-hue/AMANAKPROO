@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Amanak Pro</title>
+<style>
+body{font-family:sans-serif;background:#0f172a;color:white;text-align:center;padding:20px}
+.card{background:white;color:black;border-radius:15px;padding:20px;margin:15px 0}
+.btn{background:#2563eb;color:white;padding:15px;border-radius:10px;display:block;margin:10px 0;text-decoration:none;font-weight:bold}
+</style>
+</head>
+<body>
+<h1>🛡️ أمانك برو</h1>
+<p>تطبيق حماية الأطفال</p>
+<div class="card">
+<h3>⏰ وقت الشاشة</h3>
+<p id="time">0 دقيقة اليوم</p>
+</div>
+<div class="card">
+<h3>🚨 زر الاستغاثة</h3>
+<a class="btn" href="tel:122">اتصال بالنجدة 122</a>
+<a class="btn" style="background:#16a34a" href="https://wa.me/201000000000">واتساب الأب</a>
+</div>
+<div class="card">
+<h3>🚫 حجب المحتوى</h3>
+<p>تم تفعيل الحماية</p>
+</div>
+<script>
+let m=0;setInterval(()=>{m++;document.getElementById('time').innerText=m+" دقيقة اليوم"},60000);
+</script>
+</body>
+</html>
