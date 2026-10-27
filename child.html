@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تطبيق الطفل</title>
+<title>الطفل</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 *{font-family:Cairo,sans-serif;box-sizing:border-box;margin:0;padding:0}
@@ -11,78 +11,63 @@ body{background:linear-gradient(135deg,#1a73e8,#0d47a1);min-height:100vh;padding
 .card{background:white;color:#202124;border-radius:20px;padding:18px;margin:12px 0}
 .btn{padding:14px;border-radius:12px;border:0;width:100%;font-weight:700;font-size:16px;cursor:pointer}
 .btn-cam{background:#00c853;color:white}
-.btn-sos{background:#d93025;color:white;font-size:20px;animation:pulse 1.5s infinite}
-@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+.btn-sos{background:#d93025;color:white}
 #reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px;display:none}
-.badge{padding:8px;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:13px;margin-top:10px}
-.code-display{font-size:22px;font-weight:bold;letter-spacing:2px;background:#f1f3f4;padding:10px;border-radius:8px;margin-top:10px;color:#1a73e8;user-select:none}
+.code-display{font-size:18px;font-weight:bold;background:#f1f3f4;padding:10px;border-radius:8px;margin-top:10px;color:#1a73e8}
 </style>
 </head>
 <body>
-<h2>👶 أمانك برو - حماية</h2>
+<h2>👶 أمانك برو</h2>
 <div class="card">
-<h3>🔗 ربط مع ولي الأمر</h3>
 <div id="notConnected">
-<button class="btn btn-cam" onclick="startScan()">📷 افتح الكاميرا لتصوير QR ولي الأمر</button>
+<h3>🔗 ربط مع ولي الأمر</h3>
+<button class="btn btn-cam" onclick="startScan()">📷 صور QR ولي الأمر</button>
 <div id="reader"></div>
-<p style="font-size:11px;color:#888;margin-top:8px">أو اطلب من ولي الأمر كتابة الكود</p>
 </div>
 <div id="connected" style="display:none">
-<div class="badge">✅ تم الربط بنجاح</div>
+<div style="padding:8px;background:#e8f5e9;color:#2e7d32;border-radius:8px">✅ تم الربط بنجاح</div>
 <div id="familyShow" class="code-display"></div>
-<p style="font-size:12px;color:green;margin-top:8px">يشارك الموقع الآن مع ولي الأمر</p>
+<p style="font-size:12px;color:green;margin-top:8px">يشارك الموقع الآن</p>
 </div>
 </div>
-<div class="card">
-<h3>🆘 زر الطوارئ SOS</h3>
-<button class="btn btn-sos" onclick="sendSOS()">SOS - استغاثة</button>
-<p id="sosMsg" style="font-size:12px;margin-top:8px;color:#d93025"></p>
-</div>
-
+<div class="card"><button class="btn btn-sos" onclick="sendSOS()">SOS - استغاثة</button><p id="sosMsg" style="font-size:12px;margin-top:8px;color:#d93025"></p></div>
 <script>
-const BUCKET = "AmanakPro2026_Demo_9911";
-let familyId = localStorage.getItem('familyId');
+const BUCKET="AmanakPro2026_Demo_9911";
+let familyId=localStorage.getItem('familyId');
+let childId=localStorage.getItem('childId');
+if(!childId){childId="CHILD-"+Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem('childId',childId)}
 if(familyId) showConnected(familyId);
-
 function startScan(){
   document.getElementById('reader').style.display='block';
-  const h = new Html5Qrcode("reader");
+  const h=new Html5Qrcode("reader");
   h.start({facingMode:"environment"},{fps:10,qrbox:250},(txt)=>{
     h.stop(); document.getElementById('reader').style.display='none';
-    let fid=txt; try{fid=JSON.parse(txt).fid}catch(e){}
-    doConnect(fid);
+    let fid=txt; try{fid=JSON.parse(txt).fid||txt}catch(e){} fid=fid.replace(/"/g,'').trim();
+    localStorage.setItem('familyId',fid); 
+    fetch(`https://kvdb.io/${BUCKET}/${fid}_newchild`,{method:'POST',body:JSON.stringify({childId:childId,name:'ابني',ts:Date.now()})});
+    showConnected(fid); sendLocation(fid);
   });
-}
-function doConnect(fid){
-  fid = fid.replace(/[^A-Z0-9\-]/g,'').substring(0,20);
-  if(!fid.startsWith("FAM-")) fid="FAM-"+fid;
-  localStorage.setItem('familyId',fid);
-  showConnected(fid);
-  sendLocation(fid);
 }
 function showConnected(fid){
   document.getElementById('notConnected').style.display='none';
   document.getElementById('connected').style.display='block';
-  document.getElementById('familyShow').innerText=fid;
-  setInterval(()=>sendLocation(fid),15000);
-  sendLocation(fid);
+  document.getElementById('familyShow').innerText=fid+" / "+childId;
+  setInterval(()=>sendLocation(fid),15000); sendLocation(fid);
 }
 function sendLocation(fid){
   if(!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(pos=>{
-    fetch(`https://kvdb.io/${BUCKET}/${fid}`,{method:'POST',body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),bat:80})}).catch(()=>{});
-    fetch(`https://kvdb.io/${BUCKET}/${fid}_apps`,{method:'POST',body:JSON.stringify({tiktok:65,pubg:42,yt:120})}).catch(()=>{});
+    fetch(`https://kvdb.io/${BUCKET}/${fid}_${childId}`,{method:'POST',body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()})});
   });
 }
 function sendSOS(){
-  let fid=localStorage.getItem('familyId');
-  if(!fid){alert("اربط أولاً");return}
+  let fid=localStorage.getItem('familyId'); if(!fid){alert("اربط أولاً");return}
   navigator.geolocation.getCurrentPosition(pos=>{
-    fetch(`https://kvdb.io/${BUCKET}/${fid}_SOS`,{method:'POST',body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()})});
-    document.getElementById('sosMsg').innerText="✅ تم إرسال استغاثة حقيقية بموقعك!";
+    fetch(`https://kvdb.io/${BUCKET}/${fid}_${childId}_SOS`,{method:'POST',body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()})});
+    document.getElementById('sosMsg').innerText="✅ تم إرسال استغاثة حقيقية!";
   });
 }
 </script>
-<p onclick="localStorage.removeItem('appRole');location.href='index.html'" style="text-align:center;font-size:11px;color:#888;margin-top:20px;cursor:pointer;text-decoration:underline">🔄 تحويل هذا الجهاز لطفل</p>  
+<p onclick="localStorage.removeItem('appRole');location.href='index.html'" style="text-align:center;font-size:11px;color:#fff;margin-top:20px;text-decoration:underline;cursor:pointer">🔄 تحويل لولي أمر</p>
 </body>
 </html>
