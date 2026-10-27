@@ -4,82 +4,77 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تطبيق الطفل - AMANAK PRO</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 *{font-family:'Cairo',sans-serif;box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(135deg,#1a73e8,#0d47a1);min-height:100vh;padding:20px;color:white;text-align:center}
-.card{background:white;color:#202124;border-radius:20px;padding:20px;margin:15px 0;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
-.btn{padding:16px;border-radius:12px;border:0;width:100%;font-weight:700;font-size:18px;cursor:pointer;margin-top:10px}
-.btn-sos{background:#d93025;color:white;font-size:22px;animation:pulse 1.5s infinite}
+body{background:linear-gradient(135deg,#1a73e8,#0d47a1);min-height:100vh;padding:15px;color:white;text-align:center}
+.card{background:white;color:#202124;border-radius:20px;padding:18px;margin:12px 0;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+.btn{padding:14px;border-radius:12px;border:0;width:100%;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px}
+.btn-sos{background:#d93025;color:white;font-size:20px;animation:pulse 1.5s infinite}
 .btn-scan{background:#1a73e8;color:white}
+.btn-cam{background:#00c853;color:white;margin-top:5px}
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
-.status{padding:10px;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:13px}
+#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px;display:none}
 input{width:100%;padding:12px;border-radius:8px;border:1px solid #dadce0;margin-top:10px;text-align:center}
 </style>
 </head>
 <body>
-<h1 style="margin-top:10px">👶 أمانك برو - حماية</h1>
-<p style="font-size:13px;opacity:0.9">هذا التطبيق يحميك ويشارك موقعك مع ولي أمرك فقط</p>
+<h2>👶 أمانك برو - حماية</h2>
+<p style="font-size:12px;opacity:0.9;margin:5px 0">هذا التطبيق يحميك ويشارك موقعك مع ولي أمرك فقط</p>
 
 <div class="card">
 <h3>🔗 ربط مع ولي الأمر</h3>
 <p style="font-size:12px;color:#5f6368">صوّر كود الـ QR من موبايل بابا</p>
-<input id="qrInput" placeholder="الصق كود العائلة هنا مثل: FAM-ABC123">
+<button class="btn btn-cam" onclick="startScan()">📷 افتح الكاميرا لتصوير QR ولي الأمر</button>
+<div id="reader"></div>
+<input id="qrInput" placeholder="أو الصق كود العائلة هنا: FAM-ABC123">
 <button class="btn btn-scan" onclick="connect()">✅ ربط الآن</button>
-<p id="connectMsg" style="font-size:12px;margin-top:8px"></p>
-<div class="status" id="protectStatus">🛡️ الحماية من المواقع الخطرة: مفعلة</div>
+<p id="connectMsg" style="font-size:12px;margin-top:8px;color:green"></p>
+<p style="margin-top:8px;padding:8px;background:#e8f5e9;color:#2e7d32;border-radius:8px;font-size:12px">🛡️ الحماية من المواقع الخطرة: مفعلة</p>
 </div>
 
 <div class="card">
-<h3>🆘 زر الطوارئ</h3>
+<h3>🆘 زر الطوارئ SOS</h3>
 <p style="font-size:12px;color:#5f6368">دوس لو حسيت بخطر - بابا هيعرف مكانك فوراً</p>
-<button class="btn btn-sos" onclick="sendSOS()">🆘 SOS - استغاثة</button>
+<button class="btn btn-sos" onclick="sendSOS()">SOS - استغاثة</button>
 <p id="sosMsg" style="font-size:12px;margin-top:8px;color:#d93025"></p>
 </div>
 
 <div class="card" style="text-align:right">
 <h3 style="text-align:center">📊 نشاطي اليوم</h3>
-<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span>الموقع</span><span id="locStatus" style="color:green">● يشارك الآن</span></div>
-<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span>وقت الشاشة</span><span>3س 12د</span></div>
-<div style="display:flex;justify-content:space-between;padding:8px 0"><span>مواقع محجوبة</span><span>12 موقع</span></div>
+<div style="display:flex;justify-content:space-between;padding:8px 0"><span>الموقع</span><span id="locStatus" style="color:green">● يشارك الآن</span></div>
 </div>
 
-<p style="font-size:11px;opacity:0.7;margin-top:10px">مصمم للأمان العائلي - لا يجمع بيانات خارج العائلة - AMANAK PRO 2026</p>
-
 <script>
-let familyId = localStorage.getItem('familyId');
-if(familyId){document.getElementById('connectMsg').innerText="✅ مرتبط بالعائلة: "+familyId}
-
-function connect(){
-  const code = document.getElementById('qrInput').value.trim();
-  if(!code){alert("الصق الكود أولاً");return}
-  try{
-    const data = JSON.parse(code);
-    familyId = data.fid;
-  }catch(e){familyId = code}
-  localStorage.setItem('familyId', familyId);
-  document.getElementById('connectMsg').innerText="✅ تم الربط بنجاح: "+familyId;
-  startSharing();
+let html5QrcodeScanner;
+function startScan(){
+  document.getElementById('reader').style.display='block';
+  html5QrcodeScanner = new Html5Qrcode("reader");
+  html5QrcodeScanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: {width: 250, height: 250} },
+    (decodedText) => {
+      document.getElementById('qrInput').value = decodedText;
+      html5QrcodeScanner.stop();
+      document.getElementById('reader').style.display='none';
+      connect();
+    },
+    (error) => {}
+  ).catch(err=>{alert("الكاميرا تحتاج https - جرب متصفح كروم")});
 }
-function startSharing(){
-  if(!navigator.geolocation){return}
-  setInterval(()=>{
-    navigator.geolocation.getCurrentPosition(pos=>{
-      const loc = {lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now(),fid:familyId};
-      localStorage.setItem('lastLoc',JSON.stringify(loc));
-      document.getElementById('locStatus').innerText="● آخر إرسال: الآن";
-    });
-  },60000);
-  document.getElementById('protectStatus').innerText="🛡️ الحماية ومشاركة الموقع: شغالة";
+function connect(){
+  let code = document.getElementById('qrInput').value.trim();
+  if(!code){alert("صوّر الـ QR أولاً");return}
+  try{let d=JSON.parse(code);code=d.fid}catch(e){}
+  localStorage.setItem('familyId', code);
+  document.getElementById('connectMsg').innerText="✅ تم الربط بنجاح بالعائلة: "+code;
 }
 function sendSOS(){
-  if(!familyId){alert("اربط مع ولي الأمر أولاً");return}
-  const sos = {fid:familyId,type:"SOS",ts:Date.now(),loc:localStorage.getItem('lastLoc')};
-  localStorage.setItem('SOS_'+Date.now(),JSON.stringify(sos));
-  document.getElementById('sosMsg').innerText="✅ تم إرسال استغاثة لولي الأمر بموقعك الحالي!";
-  if(navigator.vibrate){navigator.vibrate([200,100,200])}
+  let fid=localStorage.getItem('familyId');
+  if(!fid){alert("اربط مع ولي الأمر أولاً");return}
+  document.getElementById('sosMsg').innerText="✅ تم إرسال استغاثة بموقعك لولي الأمر!";
+  if(navigator.vibrate)navigator.vibrate([200,100,200]);
 }
-// شغل المشاركة تلقائي لو مربوط قبل كده
-if(familyId){startSharing()}
 </script>
 </body>
 </html>
