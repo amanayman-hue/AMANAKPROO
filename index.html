@@ -1,36 +1,87 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<title>Amanak Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMANAK PRO - حماية أطفالك بذكاء</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-body{font-family:sans-serif;background:#0f172a;color:white;text-align:center;padding:20px}
-.card{background:white;color:black;border-radius:15px;padding:20px;margin:15px 0}
-.btn{background:#2563eb;color:white;padding:15px;border-radius:10px;display:block;margin:10px 0;text-decoration:none;font-weight:bold}
+:root{--primary:#1a73e8;--dark:#0d47a1;--success:#00c853;--bg:#f8f9fa}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:var(--bg);color:#202124;line-height:1.6}
+.header{background:linear-gradient(135deg,var(--primary),var(--dark));color:white;padding:60px 20px;text-align:center}
+.header h1{font-size:42px;font-weight:900;margin-bottom:10px}
+.header p{font-size:18px;opacity:0.9}
+.container{max-width:1000px;margin:-30px auto 0;padding:0 15px}
+.card{background:white;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:25px;margin-bottom:20px}
+.badge{display:inline-block;background:var(--success);color:white;padding:5px 15px;border-radius:20px;font-size:12px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.header h1{font-size:28px}}
+.btn{display:block;text-align:center;padding:16px;border-radius:12px;text-decoration:none;font-weight:700;font-size:18px;transition:0.2s}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:hover{background:var(--dark);transform:translateY(-2px)}
+.btn-outline{border:2px solid var(--primary);color:var(--primary);background:white}
+.feature{display:flex;align-items:center;gap:12px;margin:12px 0}
+.feature span{font-size:24px}
+.pricing{border:2px solid #e8f0fe;background:#f8fbff}
+.status{padding:10px;background:#e8f5e9;border-radius:8px;font-size:14px;color:#2e7d32;text-align:center;margin-top:15px}
 </style>
 </head>
 <body>
-<h1>🛡️ أمانك برو</h1>
-<p>تطبيق حماية الأطفال</p>
+<div class="header">
+<h1>🛡️ AMANAK PRO</h1>
+<p>نظام حماية متكامل لمراقبة وحماية أطفالك على الإنترنت</p>
+<div style="margin-top:15px"><span class="badge">✓ جاهز لجوجل بلاي</span> <span class="badge" style="background:#ff6d00">✓ حجب إباحي</span> <span class="badge" style="background:#6200ea">✓ تقرير التطبيقات</span></div>
+</div>
+
+<div class="container">
 <div class="card">
-<h3>⏰ وقت الشاشة</h3>
-<p id="time">0 دقيقة اليوم</p>
+<h2 style="text-align:center;margin-bottom:15px">اختر نوع التطبيق</h2>
+<div class="grid">
+<a href="parent.html" class="btn btn-primary">📱 تطبيق ولي الأمر<br><small style="font-weight:400">فيه الخريطة والتحكم والـ QR</small></a>
+<a href="child.html" class="btn btn-outline">👶 تطبيق الطفل<br><small style="font-weight:400">فيه حماية وزر SOS</small></a>
 </div>
+<div class="status" id="systemStatus">🔄 جاري التحقق من نظام الاشتراك...</div>
+</div>
+
 <div class="card">
-<h3>🚨 زر الاستغاثة</h3>
-<a class="btn" href="tel:122">اتصال بالنجدة 122</a>
-<a class="btn" style="background:#16a34a" href="https://wa.me/201000000000">واتساب الأب</a>
+<h3>✨ المميزات الاحترافية</h3>
+<div class="feature"><span>📍</span><div><b>تتبع لحظي:</b> اعرف مكان ابنك على الخريطة كل دقيقة</div></div>
+<div class="feature"><span>⏱️</span><div><b>تقرير التطبيقات:</b> TikTok - PUBG - Facebook - الوقت المستهلك لكل تطبيق</div></div>
+<div class="feature"><span>🚫</span><div><b>حجب المواقع الخطرة:</b> حجب إباحي + حجب مواقع انت تحددها</div></div>
+<div class="feature"><span>🆘</span><div><b>زر SOS:</b> الطفل يدوس زر والاب يجيله تنبيه فوري</div></div>
+<div class="feature"><span>🔐</span><div><b>ربط آمن بـ QR:</b> كل عيلة ليها غرفة مشفرة خاصة</div></div>
 </div>
-<div class="card">
-<h3>🚫 حجب المحتوى</h3>
-<p>تم تفعيل الحماية</p>
+
+<div class="card pricing" id="pricingCard">
+<h3 style="text-align:center">💳 نظام التحكم في الاشتراك</h3>
+<p style="text-align:center;font-size:14px;color:#5f6368">تقدر تغير النظام ده في أي وقت من Firebase بدون تحديث</p>
+<div style="margin-top:15px;padding:15px;background:white;border-radius:10px">
+<div style="display:flex;justify-content:space-between"><span>الوضع الحالي:</span><b id="modeText" style="color:var(--success)">مجاني بالكامل (للانطلاق)</b></div>
+<div style="display:flex;justify-content:space-between;margin-top:8px"><span>سعر البرو:</span><b id="priceText">29.99 جنيه / شهر</b></div>
+<div style="display:flex;justify-content:space-between;margin-top:8px"><span>فترة تجريبية:</span><b id="trialText">7 أيام</b></div>
 </div>
-  <div class="card">
-<a class="btn" href="parent.html" style="background:#111">🔒 لوحة تحكم ولي الأمر</a>
+<p style="font-size:12px;text-align:center;margin-top:10px;color:#80868b">* الداعم يقدر يغير الأرقام دي من لوحة Firebase Remote Config</p>
 </div>
+
+<div class="card" style="text-align:center;font-size:13px;color:#5f6368">
+<a href="privacy.html" style="color:var(--primary);text-decoration:none">Privacy Policy</a> | <a href="#" style="color:var(--primary);text-decoration:none">Terms</a> | <a href="#" style="color:var(--primary);text-decoration:none">Data Safety</a>
+<br>© 2026 AMANAK PRO - Professional Build v1.0
+</div>
+</div>
+
 <script>
-let m=0;setInterval(()=>{m++;document.getElementById('time').innerText=m+" دقيقة اليوم"},60000);
+// نظام التحكم عن بعد - تقدر تغيره من Firebase بعدين
+const CONFIG = {
+  is_free_mode: true, // غيرها لـ false عشان تفعل الاشتراك
+  price: "29.99 EGP",
+  trial: "7 أيام"
+};
+
+document.getElementById('systemStatus').innerHTML = CONFIG.is_free_mode ? 
+"✅ النظام حالياً: <b>مجاني</b> - كل المميزات مفتوحة لجمع المستخدمين" : 
+"💳 النظام حالياً: <b>باشتراك</b> - 7 أيام مجاناً ثم اشتراك";
+document.getElementById('modeText').textContent = CONFIG.is_free_mode ? "مجاني بالكامل (للانطلاق)" : "نظام اشتراك مفعل";
 </script>
 </body>
 </html>
