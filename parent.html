@@ -4,97 +4,70 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ولي الأمر - AMANAK PRO</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
-*{font-family:'Cairo',sans-serif;box-sizing:border-box;margin:0;padding:0}
+*{font-family:Cairo,sans-serif;box-sizing:border-box;margin:0;padding:0}
 body{background:#f1f3f4;padding:15px}
-.card{background:white;border-radius:16px;padding:20px;margin-bottom:15px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
-h2{color:#1a73e8;margin-bottom:10px}
-.btn{padding:14px;border-radius:10px;border:0;width:100%;font-weight:700;font-size:16px;cursor:pointer}
-.btn-blue{background:#1a73e8;color:white}
-.btn-green{background:#00c853;color:white}
-#qrcode{display:flex;justify-content:center;margin:15px 0;padding:15px;background:#f8f9fa;border-radius:12px}
-.app-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
-.badge-free{background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:10px;font-size:12px}
-.map-box{height:250px;background:#e8eaed;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#5f6368}
+.card{background:white;border-radius:16px;padding:16px;margin:10px 0;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.btn{padding:12px;border-radius:10px;border:0;width:100%;font-weight:700;cursor:pointer;background:#1a73e8;color:white}
+.badge{padding:6px 10px;border-radius:20px;font-size:12px;display:inline-block}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+.badge-red{background:#fce8e6;color:#d93025;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0.5}}
+#qrcode{display:flex;justify-content:center;padding:15px}
+.map{width:100%;height:220px;background:#e8eaed;border-radius:12px;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
+<h2 style="text-align:center">👨‍👩‍👧 لوحة ولي الأمر</h2>
 
-<div class="card">
-<h2>🔐 ربط جهاز الطفل</h2>
-<p style="font-size:13px;color:#5f6368">اعطي هذا الـ QR لابنك يصوره من تطبيق الطفل. الكود ينتهي بعد 5 دقائق للأمان.</p>
+<div class="card" id="qrCard">
+<h3>🔗 ربط طفل جديد</h3>
+<p style="font-size:12px;color:#666">خلي الطفل يصور هذا الكود</p>
 <div id="qrcode"></div>
-<div style="text-align:center">
-<button class="btn btn-blue" onclick="generateQR()">🔄 توليد كود جديد</button>
-<p id="qrCodeText" style="font-size:12px;margin-top:10px;color:#1a73e8;word-break:break-all"></p>
-<p id="timer" style="font-size:12px;color:red;margin-top:5px"></p>
-</div>
+<p id="famCode" style="text-align:center;font-weight:bold;letter-spacing:1px"></p>
+<p id="connectState" style="text-align:center;font-size:12px;color:#888;margin-top:5px">في انتظار اتصال الطفل...</p>
 </div>
 
-<div class="card">
-<h2>📍 موقع الطفل الآن</h2>
-<div class="map-box" id="mapBox">🗺️ بانتظار اتصال الطفل...<br><small>سيظهر هنا أول ما الطفل يفتح تطبيقه</small></div>
-<p id="lastSeen" style="font-size:12px;color:#5f6368;margin-top:8px;text-align:center">آخر تحديث: لم يتصل بعد</p>
+<div class="card" id="dashCard" style="display:none">
+<h3>📍 موقع الطفل الحقيقي <span id="liveBadge" class="badge badge-green">● مباشر</span></h3>
+<div class="map" id="mapBox">جاري جلب الموقع...</div>
+<p id="locText" style="font-size:12px;margin-top:8px"></p>
+<div id="sosBox" style="display:none;margin-top:10px;padding:10px;background:#fce8e6;border-radius:8px;color:#d93025;font-weight:bold">🚨 SOS! الطفل طلب استغاثة الآن!</div>
 </div>
 
-<div class="card">
-<h2>⏱️ تقرير استخدام التطبيقات <span class="badge-free">PRO</span></h2>
-<div id="appReport">
-<div class="app-row"><span>🎵 TikTok</span><span><b>2س 15د</b> اليوم</span></div>
-<div class="app-row"><span>🎮 PUBG Mobile</span><span><b>1س 40د</b> اليوم</span></div>
-<div class="app-row"><span>📘 Facebook</span><span><b>55د</b> اليوم</span></div>
-<div class="app-row"><span>📸 Instagram</span><span><b>30د</b> اليوم</span></div>
-<div class="app-row"><span>▶️ YouTube</span><span><b>1س 10د</b> اليوم</span></div>
-</div>
-<p style="font-size:11px;color:#80868b;margin-top:10px">* البيانات تجريبية - ستظهر الحقيقية بعد ربط الطفل وتفعيل الصلاحيات</p>
-</div>
-
-<div class="card">
-<h2>💳 تحكم الاشتراك (للمالك)</h2>
-<label style="font-size:14px"><input type="checkbox" id="freeToggle" checked onchange="toggleMode()"> الوضع المجاني مفعل (لجمع المستخدمين)</label>
-<div style="margin-top:10px;display:flex;gap:10px">
-<input id="priceInput" style="flex:1;padding:10px;border-radius:8px;border:1px solid #dadce0" value="29.99 جنيه">
-<button class="btn btn-green" style="flex:1" onclick="saveSettings()">حفظ</button>
-</div>
-<p id="saveMsg" style="font-size:12px;color:green;text-align:center;margin-top:5px"></p>
+<div class="card" id="appsCard" style="display:none">
+<h3>📱 استخدام حقيقي</h3>
+<div id="appsList" style="font-size:14px"></div>
 </div>
 
 <script>
-let familyId = "FAM-" + Math.random().toString(36).substring(2,8).toUpperCase() + "-" + Date.now().toString().slice(-4);
-let qrTimer;
+const BUCKET="AmanakPro2026_Demo_9911";
+let familyId = localStorage.getItem('parentFamId');
+if(!familyId){familyId="FAM-"+Math.random().toString(36).substring(2,8).toUpperCase()+"-"+Math.floor(1000+Math.random()*9000); localStorage.setItem('parentFamId',familyId)}
+document.getElementById('famCode').innerText=familyId;
+new QRCode(document.getElementById("qrcode"),{text:JSON.stringify({fid:familyId,ts:Date.now()}),width:180,height:180});
 
-function generateQR(){
-  clearInterval(qrTimer);
-  const payload = JSON.stringify({fid:familyId, ts:Date.now()});
-  document.getElementById('qrcode').innerHTML = "";
-  new QRCode(document.getElementById('qrcode'), {text: payload, width: 180, height: 180});
-  document.getElementById('qrCodeText').innerText = "كود العائلة: " + familyId;
-  let sec = 300;
-  qrTimer = setInterval(()=>{
-    sec--;
-    document.getElementById('timer').innerText = "ينتهي خلال: " + Math.floor(sec/60) + ":" + (sec%60).toString().padStart(2,'0');
-    if(sec<=0){clearInterval(qrTimer); document.getElementById('timer').innerText = "⛔ انتهى - ولّد كود جديد";}
-  },1000);
+setInterval(checkData,4000);
+function checkData(){
+  fetch(`https://kvdb.io/${BUCKET}/${familyId}`).then(r=>r.json()).then(d=>{
+    if(d && d.lat){ 
+      document.getElementById('qrCard').style.display='none';
+      document.getElementById('dashCard').style.display='block';
+      document.getElementById('appsCard').style.display='block';
+      document.getElementById('mapBox').innerHTML=`<a href="https://maps.google.com/?q=${d.lat},${d.lng}" target="_blank" style="text-decoration:none;color:#1a73e8">📍 افتح في خرائط جوجل<br><b>${d.lat.toFixed(5)}, ${d.lng.toFixed(5)}</b></a>`;
+      document.getElementById('locText').innerText=`آخر تحديث: ${new Date(d.ts).toLocaleTimeString('ar-EG')} - دقة حقيقية`;
+      document.getElementById('connectState').innerText="✅ الطفل متصل الآن - البيانات حقيقية";
+    }
+  }).catch(()=>{});
+  fetch(`https://kvdb.io/${BUCKET}/${familyId}_SOS`).then(r=>r.json()).then(d=>{
+    if(d && Date.now()-d.ts < 60000){document.getElementById('sosBox').style.display='block'; document.getElementById('liveBadge').className='badge badge-red'; document.getElementById('liveBadge').innerText='🚨 SOS'}
+  }).catch(()=>{});
+  fetch(`https://kvdb.io/${BUCKET}/${familyId}_apps`).then(r=>r.json()).then(d=>{
+    if(d) document.getElementById('appsList').innerHTML=`<div>🎵 تيك توك: ${d.tiktok} دقيقة</div><div>🎮 ببجي: ${d.pubg} دقيقة</div><div>▶️ يوتيوب: ${d.yt} دقيقة</div>`;
+  }).catch(()=>{});
 }
-generateQR();
-
-function toggleMode(){
-  const isFree = document.getElementById('freeToggle').checked;
-  localStorage.setItem('amanak_free', isFree);
-}
-function saveSettings(){
-  const price = document.getElementById('priceInput').value;
-  localStorage.setItem('amanak_price', price);
-  document.getElementById('saveMsg').innerText = "✅ تم الحفظ - السعر الجديد سيظهر لكل المستخدمين";
-  setTimeout(()=>document.getElementById('saveMsg').innerText="",2000);
-}
-// محاكاة موقع الطفل (للتجربة)
-setTimeout(()=>{
-  document.getElementById('mapBox').innerHTML = "📍 الطفل في: <b>بئر العبد، شمال سيناء</b><br><small>دقة 15 متر - منذ دقيقة</small>";
-  document.getElementById('lastSeen').innerText = "آخر تحديث: الآن";
-},5000);
+checkData();
 </script>
 </body>
 </html>
