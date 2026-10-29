@@ -1,74 +1,48 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ولي الأمر - AMANAK PRO</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<style>
-*{font-family:Cairo,sans-serif;box-sizing:border-box;margin:0;padding:0}
-body{background:#f1f3f4;padding:15px}
-.card{background:white;border-radius:16px;padding:16px;margin:10px 0;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
-.btn{padding:12px;border-radius:10px;border:0;width:100%;font-weight:700;cursor:pointer;background:#1a73e8;color:white}
-.badge{padding:6px 10px;border-radius:20px;font-size:12px;display:inline-block}
-.badge-green{background:#e8f5e9;color:#2e7d32}
-.badge-red{background:#fce8e6;color:#d93025;animation:blink 1s infinite}
-@keyframes blink{50%{opacity:0.5}}
-#qrcode{display:flex;justify-content:center;padding:15px}
-.map{width:100%;height:220px;background:#e8eaed;border-radius:12px;display:flex;align-items:center;justify-content:center}
-</style>
-</head>
-<body>
-<h2 style="text-align:center">👨‍👩‍👧 لوحة ولي الأمر</h2>
-
-<div class="card" id="qrCard">
-<h3>🔗 ربط طفل جديد</h3>
-<p style="font-size:12px;color:#666">خلي الطفل يصور هذا الكود</p>
-<div id="qrcode"></div>
-<p id="famCode" style="text-align:center;font-weight:bold;letter-spacing:1px"></p>
-<p id="connectState" style="text-align:center;font-size:12px;color:#888;margin-top:5px">في انتظار اتصال الطفل...</p>
-</div>
-
-<div class="card" id="dashCard" style="display:none">
-<h3>📍 موقع الطفل الحقيقي <span id="liveBadge" class="badge badge-green">● مباشر</span></h3>
-<div class="map" id="mapBox">جاري جلب الموقع...</div>
-<p id="locText" style="font-size:12px;margin-top:8px"></p>
-<div id="sosBox" style="display:none;margin-top:10px;padding:10px;background:#fce8e6;border-radius:8px;color:#d93025;font-weight:bold">🚨 SOS! الطفل طلب استغاثة الآن!</div>
-</div>
-
-<div class="card" id="appsCard" style="display:none">
-<h3>📱 استخدام حقيقي</h3>
-<div id="appsList" style="font-size:14px"></div>
-</div>
-
-<script>
-const BUCKET="AmanakPro2026_Demo_9911";
-let familyId = localStorage.getItem('parentFamId');
-if(!familyId){familyId="FAM-"+Math.random().toString(36).substring(2,8).toUpperCase()+"-"+Math.floor(1000+Math.random()*9000); localStorage.setItem('parentFamId',familyId)}
-document.getElementById('famCode').innerText=familyId;
-new QRCode(document.getElementById("qrcode"),{text:JSON.stringify({fid:familyId,ts:Date.now()}),width:180,height:180});
-
-setInterval(checkData,4000);
-function checkData(){
-  fetch(`https://kvdb.io/${BUCKET}/${familyId}`).then(r=>r.json()).then(d=>{
-    if(d && d.lat){ 
-      document.getElementById('qrCard').style.display='none';
-      document.getElementById('dashCard').style.display='block';
-      document.getElementById('appsCard').style.display='block';
-      document.getElementById('mapBox').innerHTML=`<a href="https://maps.google.com/?q=${d.lat},${d.lng}" target="_blank" style="text-decoration:none;color:#1a73e8">📍 افتح في خرائط جوجل<br><b>${d.lat.toFixed(5)}, ${d.lng.toFixed(5)}</b></a>`;
-      document.getElementById('locText').innerText=`آخر تحديث: ${new Date(d.ts).toLocaleTimeString('ar-EG')} - دقة حقيقية`;
-      document.getElementById('connectState').innerText="✅ الطفل متصل الآن - البيانات حقيقية";
-    }
-  }).catch(()=>{});
-  fetch(`https://kvdb.io/${BUCKET}/${familyId}_SOS`).then(r=>r.json()).then(d=>{
-    if(d && Date.now()-d.ts < 60000){document.getElementById('sosBox').style.display='block'; document.getElementById('liveBadge').className='badge badge-red'; document.getElementById('liveBadge').innerText='🚨 SOS'}
-  }).catch(()=>{});
-  fetch(`https://kvdb.io/${BUCKET}/${familyId}_apps`).then(r=>r.json()).then(d=>{
-    if(d) document.getElementById('appsList').innerHTML=`<div>🎵 تيك توك: ${d.tiktok} دقيقة</div><div>🎮 ببجي: ${d.pubg} دقيقة</div><div>▶️ يوتيوب: ${d.yt} دقيقة</div>`;
-  }).catch(()=>{});
+// كود الربط - parent.html
+var BUCKET="AmanakPro2026_Demo_9911";
+var familyId=localStorage.getItem('parentFamId');
+if(!familyId){
+  familyId="FAM-"+Math.random().toString(36).substring(2,6).toUpperCase()+"-"+Math.floor(1000+9999*Math.random());
+  localStorage.setItem('parentFamId',familyId)
 }
-checkData();
-</script>
-  <p onclick="localStorage.removeItem('appRole');location.href='index.html'" style="text-align:center;font-size:11px;color:#888;margin-top:20px;cursor:pointer;text-decoration:underline">🔄 تحويل هذا الجهاز لطفل</p>
-</body>
-</html>
+document.getElementById('famCode').innerText=familyId;
+new QRCode(document.getElementById("qrcode"),{text:familyId,width:160,height:160});
+
+function showQR(){document.getElementById('qrModal').style.display='flex'}
+function hideQR(){document.getElementById('qrModal').style.display='none'}
+
+// قائمة الأطفال المحفوظة للأبد
+var children=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');
+renderChildren();
+
+function renderChildren(){
+  var div=document.getElementById('childrenList');
+  if(children.length==0){div.innerHTML='<p style="font-size:12px;color:#888">لم يتم ربط أي طفل بعد</p>';return}
+  div.innerHTML='';
+  for(var i=0;i<children.length;i++){
+    var c=children[i];
+    div.innerHTML+='<div class="child-item"><div><b>'+c.name+'</b><br><span style="font-size:11px;color:#666">'+c.id+'</span></div><div><span class="badge badge-on">● متصل</span><br><button class="btn btn-small" onclick="viewChild(\''+c.id+'\',\''+c.name+'\')">عرض</button></div></div>'
+  }
+}
+
+// ده اللي بيسمع هل في ابن جديد صور الـ QR
+setInterval(function(){
+  fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_newchild",{cache:'no-store'})
+  .then(function(r){return r.text()})
+  .then(function(t){
+    try{
+      var d=JSON.parse(t);
+      if(d&&d.childId){
+        var found=false;
+        for(var j=0;j<children.length;j++){if(children[j].id==d.childId)found=true}
+        if(!found){
+          children.push({id:d.childId,name:d.name||'ابني '+(children.length+1)});
+          localStorage.setItem('myChildren_'+familyId,JSON.stringify(children));
+          renderChildren();
+          hideQR();
+          alert('✅ تم ربط '+d.childId+' بنجاح!');
+        }
+      }
+    }catch(e){}
+  });
+},3000);
