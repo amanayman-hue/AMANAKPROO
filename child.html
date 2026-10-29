@@ -2,72 +2,30 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الطفل</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>الابن - AMANAK</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<style>
-*{font-family:Cairo,sans-serif;box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(135deg,#1a73e8,#0d47a1);min-height:100vh;padding:15px;color:white;text-align:center}
-.card{background:white;color:#202124;border-radius:20px;padding:18px;margin:12px 0}
-.btn{padding:14px;border-radius:12px;border:0;width:100%;font-weight:700;font-size:16px;cursor:pointer}
-.btn-cam{background:#00c853;color:white}
-.btn-sos{background:#d93025;color:white}
-#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px;display:none}
-.code-display{font-size:18px;font-weight:bold;background:#f1f3f4;padding:10px;border-radius:8px;margin-top:10px;color:#1a73e8}
-</style>
+<style>*{font-family:Cairo,sans-serif;box-sizing:border-box;margin:0;padding:0}body{background:linear-gradient(135deg,#1a73e8,#0d47a1);min-height:100vh;padding:15px;color:white}.card{background:white;color:#202124;border-radius:20px;padding:16px;margin:10px 0}.btn{padding:14px;border-radius:12px;border:0;font-weight:700;width:100%;cursor:pointer}.btn-cam{background:#00c853;color:white}.btn-sos{background:#d93025;color:white;margin-top:10px}#reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px}</style>
 </head>
 <body>
-<h2>👶 أمانك برو</h2>
+<h2>👶 جهاز الابن</h2>
 <div class="card">
-<div id="notConnected">
-<h3>🔗 ربط مع ولي الأمر</h3>
-<button class="btn btn-cam" onclick="startScan()">📷 صور QR ولي الأمر</button>
-<div id="reader"></div>
+<div id="notConnected"><h3>🔗 ارتبط مع ولي الأمر</h3><button class="btn btn-cam" onclick="startScan()">📷 تصوير الكود</button><div id="reader"></div></div>
+<div id="connected" style="display:none"><p>✅ مربوط</p><div id="familyShow"></div><p id="statusLoc">جاري تحديد الموقع...</p></div>
 </div>
-<div id="connected" style="display:none">
-<div style="padding:8px;background:#e8f5e9;color:#2e7d32;border-radius:8px">✅ تم الربط بنجاح</div>
-<div id="familyShow" class="code-display"></div>
-<p style="font-size:12px;color:green;margin-top:8px">يشارك الموقع الآن</p>
-</div>
-</div>
-<div class="card"><button class="btn btn-sos" onclick="sendSOS()">SOS - استغاثة</button><p id="sosMsg" style="font-size:12px;margin-top:8px;color:#d93025"></p></div>
+<div class="card"><button class="btn btn-sos" onclick="sendSOS()">🚨 SOS</button></div>
+<p onclick="localStorage.clear();location.reload()" style="text-align:center;font-size:11px;color:rgba(255,255,255,0.7);margin-top:20px;cursor:pointer">🔄 فك الارتباط</p>
 <script>
-const BUCKET="AmanakPro2026_Demo_9911";
-let familyId=localStorage.getItem('familyId');
-let childId=localStorage.getItem('childId');
-if(!childId){childId="CHILD-"+Math.random().toString(36).substring(2,6).toUpperCase(); localStorage.setItem('childId',childId)}
-if(familyId) showConnected(familyId);
-function startScan(){
-  document.getElementById('reader').style.display='block';
-  const h=new Html5Qrcode("reader");
-  h.start({facingMode:"environment"},{fps:10,qrbox:250},(txt)=>{
-    h.stop(); document.getElementById('reader').style.display='none';
-    let fid=txt; try{fid=JSON.parse(txt).fid||txt}catch(e){} fid=fid.replace(/"/g,'').trim();
-    localStorage.setItem('familyId',fid); 
-    fetch(`https://kvdb.io/${BUCKET}/${fid}_newchild`,{method:'POST',body:JSON.stringify({childId:childId,name:'ابني',ts:Date.now()})});
-    showConnected(fid); sendLocation(fid);
-  });
-}
-function showConnected(fid){
-  document.getElementById('notConnected').style.display='none';
-  document.getElementById('connected').style.display='block';
-  document.getElementById('familyShow').innerText=fid+" / "+childId;
-  setInterval(()=>sendLocation(fid),15000); sendLocation(fid);
-}
-function sendLocation(fid){
-  if(!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos=>{
-    fetch(`https://kvdb.io/${BUCKET}/${fid}_${childId}`,{method:'POST',body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()})});
-  });
-}
-function sendSOS(){
-  let fid=localStorage.getItem('familyId'); if(!fid){alert("اربط أولاً");return}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    fetch(`https://kvdb.io/${BUCKET}/${fid}_${childId}_SOS`,{method:'POST',body:JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()})});
-    document.getElementById('sosMsg').innerText="✅ تم إرسال استغاثة حقيقية!";
-  });
-}
+var BUCKET="AmanakPro2026_Demo_9911";
+var familyId=localStorage.getItem('familyId');
+var childId=localStorage.getItem('childId');
+if(!childId){childId="CHILD-"+Math.random().toString(36).substring(2,6).toUpperCase();localStorage.setItem('childId',childId)}
+if(familyId){showConnected()}
+function showConnected(){document.getElementById('notConnected').style.display='none';document.getElementById('connected').style.display='block';document.getElementById('familyShow').innerText=familyId+" - "+childId;startLocSharing()}
+function startScan(){var html5QrCode=new Html5Qrcode("reader");html5QrCode.start({facingMode:"environment"},{fps:10,qrbox:250},function(decodedText){familyId=decodedText.trim();localStorage.setItem('familyId',familyId);html5QrCode.stop();fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_newchild",{method:"PUT",body:JSON.stringify({childId:childId,name:"ابني"})}).then(function(){showConnected();alert("تم الربط")})},function(e){}).catch(function(err){alert(err)})}
+var lastPos=null;
+function startLocSharing(){setInterval(function(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(function(pos){lastPos={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()};document.getElementById('statusLoc').innerText=lastPos.lat+","+lastPos.lng;fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_"+childId,{method:"PUT",body:JSON.stringify(lastPos)})})},15000)}
+function sendSOS(){if(!lastPos){alert("استنى الموقع");return}var sosData={lat:lastPos.lat,lng:lastPos.lng,ts:Date.now(),sos:true};fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_"+childId,{method:"PUT",body:JSON.stringify(sosData)}).then(function(){alert("تم ارسال استغاثة")})}
 </script>
-<p onclick="localStorage.removeItem('appRole');location.href='index.html'" style="text-align:center;font-size:11px;color:#fff;margin-top:20px;text-decoration:underline;cursor:pointer">🔄 تحويل لولي أمر</p>
 </body>
 </html>
