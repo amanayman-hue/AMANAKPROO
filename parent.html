@@ -2,41 +2,37 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ولي الأمر - AMANAK</title>
-<script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
-<style>*{font-family:Cairo,sans-serif;box-sizing:border-box;margin:0;padding:0}body{background:#f1f3f4;min-height:100vh;padding:15px}.card{background:white;border-radius:20px;padding:16px;margin:10px 0;box-shadow:0 2px 8px rgba(0,0,0,0.1)}.btn{padding:12px;border-radius:12px;border:0;font-weight:700;cursor:pointer}.qr-box{display:flex;justify-content:center;padding:15px;background:white;border-radius:15px;margin:10px 0}#childrenList .child{padding:12px;border:1px solid #e0e0e0;border-radius:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}</style>
+<style>body{font-family:Tahoma;background:#f1f3f4;padding:15px;text-align:center}.card{background:white;border-radius:15px;padding:20px;margin:10px auto;max-width:400px}img{border:2px solid #1a73e8;border-radius:10px}h2{color:#1a73e8}</style>
 </head>
 <body>
 <h2>👨‍👩‍👧 لوحة ولي الأمر</h2>
 <div class="card">
 <h3>🔗 كود العائلة</h3>
 <p style="font-size:12px;color:#666">خلي الابن يصور هذا الكود</p>
-<div class="qr-box"><div id="qrcode"></div></div>
-<h2 id="famCode" style="text-align:center;letter-spacing:3px"></h2>
-<button class="btn" onclick="showQR()" style="background:#1a73e8;color:white;width:100%;margin-top:10px">عرض الكود ملء الشاشة</button>
+<img id="qrImg" width="250" height="250">
+<h2 id="famCode" style="letter-spacing:3px;margin-top:10px"></h2>
+<p style="font-size:11px;color:#888">الكود يشتغل على الكمبيوتر القديم</p>
 </div>
-
 <div class="card">
 <h3>👶 أبنائي</h3>
-<div id="childrenList">لا يوجد أبناء بعد</div>
+<div id="childrenList">لسه مفيش أبناء</div>
 </div>
-
-<div id="qrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99;justify-content:center;align-items:center;flex-direction:column" onclick="this.style.display='none'"><div id="qrcode2" style="background:white;padding:20px;border-radius:20px"></div><h2 id="famCode2" style="color:white;margin-top:20px;letter-spacing:4px"></h2><p style="color:white">اضغط في أي مكان للإغلاق</p></div>
-
 <script>
 var BUCKET="AmanakPro2026_Demo_9911";
 var familyId=localStorage.getItem('parentFamId');
-if(!familyId){familyId="FAM-"+Math.random().toString(36).substring(2,6).toUpperCase()+"-"+Math.floor(1000+Math.random()*9000);localStorage.setItem('parentFamId',familyId)}
+if(!familyId){familyId="FAM-"+Math.random().toString(36).substr(2,4).toUpperCase()+"-"+Math.floor(1000+Math.random()*9000);localStorage.setItem('parentFamId',familyId)}
 document.getElementById('famCode').innerText=familyId;
-document.getElementById('famCode2').innerText=familyId;
-new QRCode(document.getElementById("qrcode"),{text:familyId,width:160,height:160});
-new QRCode(document.getElementById("qrcode2"),{text:familyId,width:280,height:280});
-function showQR(){document.getElementById('qrModal').style.display='flex'}
-function renderChildren(){var children=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');var div=document.getElementById('childrenList');if(children.length==0){div.innerHTML="لا يوجد أبناء بعد - صور الكود من موبايل الابن";return}div.innerHTML="";for(var i=0;i<children.length;i++){var c=children[i];div.innerHTML+="<div class='child'><span>👶 "+c.childId+"</span><a href='https://www.google.com/maps?q="+c.lat+","+c.lng+"' target='_blank' style='background:#00c853;color:white;padding:6px 12px;border-radius:8px;text-decoration:none'>📍 موقع</a></div>"}}
-renderChildren();
-setInterval(function(){fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"newchild",{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){try{var j=JSON.parse(t);if(j&&j.childId){var list=JSON.parse(localStorage.getItem('myChildren"}).then(function(r){return r.text()}).then(function(t){try{var j=JSON.parse(t);if(j&&j.childId){var list=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');var found=false;for(var k=0;k<list.length;k++){if(list[k].childId==j.childId)found=true}if(!found){list.push({childId:j.childId,lat:0,lng:0});localStorage.setItem('myChildren_'+familyId,JSON.stringify(list));renderChildren();fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_newchild",{method:"PUT",body:"{}"});alert("تم ربط ابن جديد: "+j.childId)}} }catch(e){}})},3000);
-setInterval(function(){var list=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');for(var i=0;i<list.length;i++){var cid=list[i].childId;fetch("https://kvdb.io/"+BUCKET+"/"+familyId+""+cid,{cache:"no-store"}).then(function(r){return r.text()}).then(function(t){try{var d=JSON.parse(t);if(d&&d.lat){var all=JSON.parse(localStorage.getItem('myChildren"}).then(function(r){return r.text()}).then(function(t){try{var d=JSON.parse(t);if(d&&d.lat){var all=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');for(var j=0;j<all.length;j++){if((familyId+""+all[j].childId)==(familyId+""+cid)){all[j].lat=d.lat;all[j].lng=d.lng}}localStorage.setItem('myChildren_'+familyId,JSON.stringify(all));renderChildren()}}catch(e){}})}},5000);
+document.getElementById('qrImg').src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data="+familyId;
+var list=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');
+if(list.length>0){document.getElementById('childrenList').innerText=list.length+" ابن مربوط";}
+setInterval(function(){
+fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_newchild").then(r=>r.text()).then(t=>{
+try{var j=JSON.parse(t);if(j&&j.childId){var list=JSON.parse(localStorage.getItem('myChildren_'+familyId)||'[]');var found=false;for(var k=0;k<list.length;k++){if(list[k].childId==j.childId)found=true}
+if(!found){list.push({childId:j.childId});localStorage.setItem('myChildren_'+familyId,JSON.stringify(list));document.getElementById('childrenList').innerText="تم ربط: "+j.childId;fetch("https://kvdb.io/"+BUCKET+"/"+familyId+"_newchild",{method:"PUT",body:"{}"});alert("تم ربط ابن جديد: "+j.childId);}}
+}catch(e){}
+});
+},3000);
 </script>
 </body>
 </html>
